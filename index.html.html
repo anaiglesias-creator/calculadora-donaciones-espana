@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Plan de Donaciones · España</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F8F4EE;
+    --parchment: #EDE8DF;
+    --forest: #2C5F3F;
+    --forest-light: #3D7A54;
+    --forest-pale: #EAF2EE;
+    --gold: #C49A3C;
+    --gold-light: #F5E8C8;
+    --ink: #1A1A18;
+    --ink-mid: #4A4A45;
+    --ink-soft: #8A8A82;
+    --red-soft: #C0392B;
+    --red-pale: #FDECEA;
+    --border: #D8D2C8;
+    --shadow: rgba(44,95,63,0.10);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--cream); color: var(--ink); font-family: 'DM Sans', sans-serif; font-weight: 300; min-height: 100vh; }
+
+  header { background: var(--forest); color: #fff; padding: 40px 48px 36px; position: relative; overflow: hidden; }
+  header::after { content:''; position:absolute; right:-60px; bottom:-60px; width:260px; height:260px; border-radius:50%; background:rgba(255,255,255,0.04); }
+  .header-eyebrow { font-size:11px; letter-spacing:3px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:10px; }
+  .header-title { font-family:'Cormorant Garamond',serif; font-size:42px; font-weight:600; line-height:1.1; margin-bottom:8px; }
+  .header-sub { font-size:14px; color:rgba(255,255,255,0.65); max-width:480px; line-height:1.6; }
+  .header-badge { position:absolute; right:48px; top:50%; transform:translateY(-50%); text-align:center; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:20px 28px; }
+  .header-badge .big { font-family:'Cormorant Garamond',serif; font-size:38px; font-weight:600; color:#fff; line-height:1; }
+  .header-badge .small { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-top:4px; }
+
+  .wrapper { max-width:1100px; margin:0 auto; padding:36px 32px 64px; }
+
+  .plan-bar { display:flex; align-items:center; gap:12px; margin-bottom:32px; flex-wrap:wrap; }
+  .plan-bar label { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-soft); font-weight:400; }
+  .plan-select { background:#fff; border:1.5px solid var(--border); border-radius:8px; padding:9px 14px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--ink); cursor:pointer; min-width:200px; }
+  .btn { display:inline-flex; align-items:center; gap:6px; padding:9px 18px; border-radius:8px; font-family:'DM Sans',sans-serif; font-size:13px; font-weight:500; cursor:pointer; border:none; transition:all 0.2s; }
+  .btn-primary { background:var(--forest); color:#fff; }
+  .btn-primary:hover { background:var(--forest-light); }
+  .btn-outline { background:#fff; color:var(--forest); border:1.5px solid var(--forest); }
+  .btn-outline:hover { background:var(--forest-pale); }
+  .btn-ghost { background:transparent; color:var(--ink-soft); border:1.5px solid var(--border); font-size:12px; padding:7px 14px; }
+  .btn-ghost:hover { border-color:var(--ink-soft); color:var(--ink); }
+  .btn-danger { background:var(--red-pale); color:var(--red-soft); border:1.5px solid #F5C6C2; font-size:12px; padding:7px 14px; }
+  .btn-danger:hover { background:#F9D7D4; }
+
+  .income-card { background:var(--gold-light); border:1.5px solid #DFC07A; border-radius:14px; padding:22px 26px; margin-bottom:28px; display:flex; align-items:flex-start; gap:28px; flex-wrap:wrap; }
+  .income-card .ic-label { font-size:12px; letter-spacing:1.5px; text-transform:uppercase; color:var(--gold); font-weight:500; margin-bottom:6px; }
+  .income-card .ic-desc { font-size:13px; color:var(--ink-mid); line-height:1.6; max-width:400px; }
+  .income-card .ic-tip { font-size:11px; color:var(--ink-soft); margin-top:6px; font-style:italic; }
+  .income-input-wrap { display:flex; align-items:center; gap:10px; margin-left:auto; padding-top:4px; }
+  .income-input-wrap label { font-size:13px; color:var(--ink-mid); white-space:nowrap; }
+  .number-input { background:#fff; border:1.5px solid #DFC07A; border-radius:8px; padding:9px 14px; font-family:'DM Sans',sans-serif; font-size:15px; color:var(--ink); width:160px; text-align:right; }
+  .number-input:focus { outline:none; border-color:var(--gold); }
+
+  .grid { display:grid; grid-template-columns:1fr 340px; gap:28px; align-items:start; }
+
+  .section-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .section-title { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:var(--ink); }
+
+  .org-list { display:flex; flex-direction:column; gap:14px; }
+
+  .org-card { background:#fff; border:1.5px solid var(--border); border-radius:14px; padding:20px 24px; transition:box-shadow 0.2s,border-color 0.2s; }
+  .org-card:hover { border-color:#B8D4C4; box-shadow:0 4px 20px var(--shadow); }
+
+  .org-card-top { display:flex; align-items:flex-start; gap:16px; margin-bottom:16px; }
+  .org-cat-dot { width:10px; height:10px; border-radius:50%; margin-top:5px; flex-shrink:0; }
+  .org-name-wrap { flex:1; }
+  .org-name-input { width:100%; font-family:'DM Sans',sans-serif; font-size:16px; font-weight:500; color:var(--ink); border:none; background:transparent; outline:none; padding:0; border-bottom:1px dashed transparent; transition:border-color 0.2s; }
+  .org-name-input:hover,.org-name-input:focus { border-bottom-color:var(--border); }
+  .org-url-input { width:100%; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--ink-soft); border:none; background:transparent; outline:none; padding:0; margin-top:3px; }
+  .org-url-input::placeholder { color:var(--border); }
+
+  .payment-mode-toggle { display:flex; border:1.5px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:14px; }
+  .pmt-btn { flex:1; padding:8px 10px; font-family:'DM Sans',sans-serif; font-size:12px; font-weight:500; color:var(--ink-soft); background:var(--cream); border:none; cursor:pointer; transition:all 0.15s; text-align:center; border-right:1px solid var(--border); }
+  .pmt-btn:last-child { border-right:none; }
+  .pmt-btn.active { background:var(--forest); color:#fff; }
+  .pmt-btn:hover:not(.active) { background:var(--forest-pale); color:var(--forest); }
+
+  .org-card-controls { display:grid; gap:14px; padding-top:14px; border-top:1px solid var(--parchment); }
+  .org-card-controls.cols-2 { grid-template-columns:1fr 1fr; }
+  .org-card-controls.cols-3 { grid-template-columns:1fr 1fr 1fr; }
+  .org-card-controls.cols-4 { grid-template-columns:1fr 1fr 1fr 1fr; }
+
+  .control-group { display:flex; flex-direction:column; gap:5px; }
+  .control-label { font-size:11px; letter-spacing:1.5px; text-transform:uppercase; color:var(--ink-soft); font-weight:400; }
+  .control-input { background:var(--cream); border:1.5px solid var(--border); border-radius:7px; padding:8px 12px; font-family:'DM Sans',sans-serif; font-size:14px; color:var(--ink); width:100%; transition:border-color 0.2s; }
+  .control-input:focus { outline:none; border-color:var(--forest); }
+  .control-select { background:var(--cream); border:1.5px solid var(--border); border-radius:7px; padding:8px 12px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--ink); width:100%; cursor:pointer; }
+  .control-select:focus { outline:none; border-color:var(--forest); }
+
+  .org-breakdown { margin-top:12px; background:var(--forest-pale); border-radius:8px; padding:10px 14px; display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+  .breakdown-item { display:flex; flex-direction:column; }
+  .breakdown-val { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; color:var(--forest); line-height:1; }
+  .breakdown-lbl { font-size:11px; color:var(--ink-soft); letter-spacing:1px; text-transform:uppercase; margin-top:2px; }
+  .breakdown-divider { width:1px; background:var(--border); align-self:stretch; margin:2px 0; }
+  .breakdown-tag { font-size:11px; color:var(--ink-soft); background:rgba(255,255,255,0.7); border-radius:4px; padding:2px 6px; }
+  .breakdown-note { font-size:14px; color:var(--forest); margin-left:auto; font-style:italic; font-family:'Cormorant Garamond',serif; }
+  .org-note-text { font-size:12px; color:var(--ink-soft); margin-top:8px; font-style:italic; padding:0 2px; line-height:1.5; }
+  .org-card-footer { display:flex; justify-content:flex-end; margin-top:14px; }
+
+  .empty-state { background:#fff; border:2px dashed var(--border); border-radius:14px; padding:48px 32px; text-align:center; color:var(--ink-soft); }
+  .empty-icon { font-size:36px; margin-bottom:12px; }
+  .empty-state p { font-size:15px; margin-bottom:20px; }
+
+  .summary-card { background:var(--forest); border-radius:16px; padding:28px 26px; color:#fff; position:sticky; top:24px; }
+  .summary-title { font-family:'Cormorant Garamond',serif; font-size:20px; font-weight:600; margin-bottom:4px; }
+  .summary-year { font-size:12px; color:rgba(255,255,255,0.5); letter-spacing:2px; text-transform:uppercase; margin-bottom:28px; }
+  .summary-row { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; }
+  .summary-row-label { font-size:13px; color:rgba(255,255,255,0.65); }
+  .summary-row-value { font-family:'Cormorant Garamond',serif; font-size:22px; font-weight:600; color:#fff; }
+  .summary-divider { height:1px; background:rgba(255,255,255,0.12); margin:18px 0; }
+
+  .summary-real-cost { background:rgba(255,255,255,0.1); border-radius:10px; padding:18px 20px; margin-bottom:20px; text-align:center; }
+  .summary-real-cost .label { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.5); margin-bottom:8px; }
+  .summary-real-cost .value { font-family:'Cormorant Garamond',serif; font-size:46px; font-weight:600; color:#fff; line-height:1; }
+  .summary-real-cost .sub { font-size:13px; color:rgba(255,255,255,0.5); margin-top:6px; }
+
+  .monthly-breakdown { background:rgba(255,255,255,0.07); border-radius:8px; padding:12px 14px; margin-bottom:16px; }
+  .mb-row { display:flex; justify-content:space-between; font-size:13px; margin-bottom:6px; color:rgba(255,255,255,0.7); }
+  .mb-row:last-child { margin-bottom:0; border-top:1px solid rgba(255,255,255,0.1); padding-top:6px; color:#fff; }
+  .mb-val { font-family:'Cormorant Garamond',serif; font-size:15px; color:#fff; }
+
+  .limit-bar-wrap { margin-bottom:22px; }
+  .limit-bar-header { display:flex; justify-content:space-between; font-size:12px; color:rgba(255,255,255,0.5); margin-bottom:6px; }
+  .limit-bar { height:6px; background:rgba(255,255,255,0.12); border-radius:3px; overflow:hidden; }
+  .limit-bar-fill { height:100%; background:#7DD4A4; border-radius:3px; transition:width 0.4s; }
+  .limit-bar-fill.warning { background:#F4B942; }
+  .limit-bar-fill.danger { background:#E06B5A; }
+
+  .tranches-section { margin-bottom:20px; }
+  .tranches-title { font-size:11px; letter-spacing:2px; text-transform:uppercase; color:rgba(255,255,255,0.4); margin-bottom:10px; }
+  .tranche-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px; }
+  .tranche-label { color:rgba(255,255,255,0.7); }
+  .tranche-pct { background:rgba(255,255,255,0.1); border-radius:4px; padding:2px 8px; font-size:12px; color:#7DD4A4; font-weight:500; }
+  .tranche-amount { color:rgba(255,255,255,0.5); font-size:12px; }
+  .info-box { background:rgba(255,255,255,0.07); border-radius:10px; padding:14px 16px; font-size:12px; color:rgba(255,255,255,0.5); line-height:1.6; margin-top:16px; }
+  .info-box strong { color:rgba(255,255,255,0.7); }
+
+  .quick-add { background:#fff; border:1.5px solid var(--border); border-radius:14px; padding:18px 22px; margin-bottom:14px; }
+  .quick-add-title { font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--ink-soft); margin-bottom:12px; }
+  .preset-filter { display:flex; gap:6px; margin-bottom:12px; flex-wrap:wrap; }
+  .filter-btn { padding:5px 12px; border-radius:20px; font-size:12px; font-family:'DM Sans',sans-serif; cursor:pointer; border:1.5px solid var(--border); background:transparent; color:var(--ink-soft); transition:all 0.15s; }
+  .filter-btn.active { border-color:var(--forest); color:var(--forest); background:var(--forest-pale); }
+  .preset-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+  .preset-btn { background:var(--cream); border:1.5px solid var(--border); border-radius:8px; padding:10px 12px; font-family:'DM Sans',sans-serif; font-size:12px; color:var(--ink-mid); cursor:pointer; text-align:left; transition:all 0.2s; line-height:1.4; }
+  .preset-btn:hover { border-color:var(--forest); color:var(--forest); background:var(--forest-pale); }
+  .preset-cat { font-size:10px; letter-spacing:1px; text-transform:uppercase; color:var(--ink-soft); display:block; margin-bottom:2px; }
+
+  .plan-name-input { background:transparent; border:none; border-bottom:2px dashed var(--border); font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; color:var(--ink); padding:4px 0; outline:none; width:100%; margin-bottom:24px; transition:border-color 0.2s; }
+  .plan-name-input:focus { border-color:var(--forest); }
+  .plan-name-input::placeholder { color:var(--border); }
+  .notes-input { width:100%; background:var(--cream); border:1.5px solid var(--border); border-radius:10px; padding:12px 16px; font-family:'DM Sans',sans-serif; font-size:13px; color:var(--ink-mid); resize:vertical; min-height:80px; outline:none; transition:border-color 0.2s; margin-bottom:24px; }
+  .notes-input:focus { border-color:var(--forest); }
+  .notes-input::placeholder { color:var(--border); }
+
+  .page-footer { margin-top:48px; padding-top:20px; border-top:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; }
+  .footer-note { font-size:12px; color:var(--ink-soft); max-width:520px; line-height:1.6; }
+  .footer-note a { color:var(--forest); }
+
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(26,26,24,0.6); backdrop-filter:blur(4px); z-index:100; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:#fff; border-radius:18px; padding:36px; max-width:440px; width:90%; box-shadow:0 24px 80px rgba(0,0,0,0.2); }
+  .modal h3 { font-family:'Cormorant Garamond',serif; font-size:24px; margin-bottom:6px; }
+  .modal p { font-size:14px; color:var(--ink-mid); margin-bottom:20px; line-height:1.5; }
+  .modal-input { width:100%; border:1.5px solid var(--border); border-radius:8px; padding:10px 14px; font-family:'DM Sans',sans-serif; font-size:15px; color:var(--ink); outline:none; margin-bottom:20px; }
+  .modal-input:focus { border-color:var(--forest); }
+  .modal-actions { display:flex; gap:10px; justify-content:flex-end; }
+
+  @media (max-width:800px) {
+    .grid { grid-template-columns:1fr; }
+    .summary-card { position:static; }
+    .header-badge { display:none; }
+    header { padding:28px 24px 24px; }
+    .wrapper { padding:24px 16px 48px; }
+    .org-card-controls.cols-3,.org-card-controls.cols-4 { grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-eyebrow">Herramienta de planificación · Ley 49/2002</div>
+  <div class="header-title">Mi Plan de<br>Donaciones</div>
+  <div class="header-sub">Calcula tu deducción real en el IRPF. Combina cuotas mensuales y aportaciones puntuales, y ve cuánto te cuestan realmente tus donaciones en España.</div>
+  <div class="header-badge">
+    <div class="big">80%</div>
+    <div class="small">hasta 250€/año</div>
+  </div>
+</header>
+
+<div class="wrapper">
+
+  <div class="plan-bar">
+    <label>Plan</label>
+    <select class="plan-select" id="planSelect" onchange="loadPlan(this.value)"></select>
+    <button class="btn btn-outline" onclick="openNewPlanModal()">+ Nuevo plan</button>
+    <button class="btn btn-ghost" onclick="deletePlan()">🗑 Eliminar</button>
+    <button class="btn btn-ghost" onclick="exportCSV()" style="margin-left:auto">↓ CSV</button>
+    <button class="btn btn-ghost" onclick="window.print()">🖨 Imprimir</button>
+  </div>
+
+  <!-- BASE LIQUIDABLE -->
+  <div class="income-card">
+    <div>
+      <div class="ic-label">Base Liquidable</div>
+      <div class="ic-desc">La ley española <strong>limita la deducción al 10% de tu base liquidable</strong>. Si tu base es 40.000€, solo puedes deducir donaciones hasta 4.000€ — si donas más, el exceso no desgrava. Es un tope que casi nadie alcanza, pero la barra te avisa si te acercas.</div>
+      <div class="ic-tip">📄 Encuéntrala en tu última declaración de la renta, casilla 0500.</div>
+    </div>
+    <div class="income-input-wrap">
+      <label>Base liquidable estimada</label>
+      <input class="number-input" type="number" id="baseLiquidable" placeholder="45000" step="1000" oninput="savePlanData();updateSummary()">
+      <span style="font-size:14px;color:var(--ink-soft)">€</span>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <input class="plan-name-input" id="planNameInput" type="text" placeholder="Nombre de mi plan..." oninput="updatePlanName()">
+
+      <div class="section-header">
+        <div class="section-title">Organizaciones</div>
+        <button class="btn btn-primary" onclick="addOrg()">+ Añadir</button>
+      </div>
+
+      <div class="quick-add">
+        <div class="quick-add-title">Añadir rápido — selección curada</div>
+        <div class="preset-filter" id="presetFilter"></div>
+        <div class="preset-grid" id="presetGrid"></div>
+      </div>
+
+      <div class="org-list" id="orgList"></div>
+
+      <div style="margin-top:28px">
+        <div class="section-title" style="margin-bottom:12px;font-size:18px">Notas del plan</div>
+        <textarea class="notes-input" id="planNotes" placeholder="Motivaciones, recordatorios, causas pendientes de investigar..." oninput="savePlanData()"></textarea>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div>
+      <div class="summary-card">
+        <div class="summary-title">Resumen fiscal</div>
+        <div class="summary-year" id="summaryYear">Plan 2026</div>
+
+        <div class="summary-real-cost">
+          <div class="label">Coste real después de IRPF</div>
+          <div class="value" id="summaryRealCost">0€</div>
+          <div class="sub" id="summaryRealSub">de 0€ donados al año</div>
+        </div>
+
+        <div class="monthly-breakdown" id="monthlyBreakdown" style="display:none">
+          <div class="mb-row"><span>Cuotas mensuales (×12)</span><span class="mb-val" id="mbMonthly">—</span></div>
+          <div class="mb-row"><span>Aportaciones puntuales</span><span class="mb-val" id="mbOnetime">—</span></div>
+          <div class="mb-row"><span>Total anual</span><span class="mb-val" id="mbTotal">—</span></div>
+        </div>
+
+        <div class="summary-row">
+          <span class="summary-row-label">Total donado al año</span>
+          <span class="summary-row-value" id="summaryTotal">0€</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Deducción en IRPF</span>
+          <span class="summary-row-value" style="color:#7DD4A4" id="summaryDeduccion">0€</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-row-label">Tasa efectiva deducción</span>
+          <span class="summary-row-value" id="summaryRate">—</span>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="limit-bar-wrap">
+          <div class="limit-bar-header">
+            <span>Límite 10% base liquidable</span>
+            <span id="limitPct">—</span>
+          </div>
+          <div class="limit-bar"><div class="limit-bar-fill" id="limitBarFill" style="width:0%"></div></div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px" id="limitNote">Introduce tu base liquidable para ver el límite</div>
+        </div>
+
+        <div class="tranches-section">
+          <div class="tranches-title">Desglose por tramos</div>
+          <div class="tranche-row"><span class="tranche-label">Hasta 250€/entidad</span><span class="tranche-pct">80%</span><span class="tranche-amount" id="t1amount">—</span></div>
+          <div class="tranche-row"><span class="tranche-label">Exceso (años 1–2)</span><span class="tranche-pct">40%</span><span class="tranche-amount" id="t2amount">—</span></div>
+          <div class="tranche-row"><span class="tranche-label">Exceso (año 3+)</span><span class="tranche-pct">45%</span><span class="tranche-amount" id="t3amount">—</span></div>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div class="info-box">
+          <strong>Cómo funciona:</strong> Los primeros <strong>250€/año por entidad</strong> deducen al 80%. El exceso al 40% (años 1–2) o <strong>45%</strong> (3+ años consecutivos donando igual o más). Solo con entidades acogidas a la <strong>Ley 49/2002</strong>. Las cuotas mensuales se anualizan automáticamente.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <div class="footer-note">
+      Cálculos orientativos. Usa los certificados de donación que emita cada entidad para tu declaración de la renta. Verifica que cada organización esté acogida a la Ley 49/2002. <a href="https://www.fundacionlealtad.org" target="_blank">Fundación Lealtad</a> certifica transparencia en España. Datos guardados localmente en tu navegador.
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="newPlanModal">
+  <div class="modal">
+    <h3>Nuevo plan de donaciones</h3>
+    <p>Dale un nombre (ej. "2026 · Ciencia y Naturaleza") y empezarás desde cero.</p>
+    <input class="modal-input" id="newPlanName" type="text" placeholder="Nombre del plan..." maxlength="60">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('newPlanModal')">Cancelar</button>
+      <button class="btn btn-primary" onclick="createPlan()">Crear plan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const PRESETS = [
+  { name:'Fund. Científica AECC',       cat:'science',     url:'https://fundacion.aecc.es',         note:'94,8% a misión. Mayor ONG de investigación oncológica de España. Acreditada Fundación Lealtad.' },
+  { name:'Fund. CRIS contra el Cáncer', cat:'science',     url:'https://criscancer.org',             note:'Financia unidades de investigación y ensayos clínicos directamente en hospitales. Acreditada FL.' },
+  { name:'Fund. Pasqual Maragall',      cat:'science',     url:'https://fpmaragall.org',             note:'Investigación y prevención del Alzheimer. Centro propio: Barcelona Beta Brain Research Center.' },
+  { name:'Médicos Sin Fronteras',       cat:'science',     url:'https://www.msf.es',                 note:'Atención médica en zonas de conflicto y crisis humanitarias. ~82% a proyectos. Acreditada FL. Pide certificado Ley 49/2002 al donar.' },
+  { name:'Médicos del Mundo',           cat:'science',     url:'https://www.medicosdelmundo.org',    note:'Cooperación sanitaria internacional y atención a colectivos vulnerables en España. Acreditada FL.' },
+  { name:'Fund. Pro CNIC',              cat:'science',     url:'https://www.procnic.es',             note:'Investigación cardiovascular del Centro Nacional (CSIC + Fundación Jiménez Díaz). Acreditada FL.' },
+  { name:'UNICEF España',               cat:'children',    url:'https://www.unicef.es',              note:'Derechos y protección de la infancia a nivel mundial. Gran transparencia. Acreditada FL.' },
+  { name:'Save the Children España',    cat:'children',    url:'https://www.savethechildren.es',     note:'Protección de la infancia en emergencias y contextos de pobreza. Acreditada FL.' },
+  { name:'Cruz Roja Española',          cat:'children',    url:'https://www.cruzroja.es',            note:'Acción social, emergencias y cooperación. Cobertura nacional completa. Acreditada FL.' },
+  { name:'Cáritas Española',            cat:'children',    url:'https://www.caritas.es',             note:'Atención a personas en situación de pobreza y exclusión social. Alta eficiencia operativa. Acreditada FL.' },
+  { name:'Fund. Balia por la Infancia', cat:'children',    url:'https://fundacionbalia.org',         note:'Equidad educativa en barrios vulnerables. Posibilidad de donar ejemplares de libros infantiles.' },
+  { name:'Inspiring Girls España',      cat:'children',    url:'https://inspiring-girls.es',         note:'Modelos femeninos en STEM para niñas. Acogida a Ley 49/2002.' },
+  { name:'SEO/BirdLife España',         cat:'environment', url:'https://www.seo.org',                note:'85,4% a misión. ONG ambiental más antigua de España (1954). 19.000 voluntarios. Acreditada FL.' },
+  { name:'Greenpeace España',           cat:'environment', url:'https://www.greenpeace.org/spain/',  note:'Campañas de presión ambiental global. Transparente pero sin financiación corporativa por política propia.' },
+  { name:'WWF España',                  cat:'environment', url:'https://www.wwf.es',                 note:'Conservación de especies y ecosistemas. Red internacional. Verificar acreditación FL actualizada.' },
+  { name:'Oxfam Intermón',              cat:'environment', url:'https://www.oxfamintermon.org',      note:'Justicia global, lucha contra la pobreza y emergencias climáticas. Acreditada FL.' },
+  { name:'Amnistía Internacional',      cat:'rights',      url:'https://www.es.amnesty.org',         note:'Defensa de derechos humanos global. Financiación 100% ciudadana — no acepta fondos de gobiernos ni empresas.' },
+  { name:'Fund. ACNUR España',          cat:'rights',      url:'https://eacnur.org',                 note:'Protección de personas refugiadas. Brazo recaudador oficial del ACNUR de la ONU en España.' },
+  { name:'Ayuda en Acción',             cat:'rights',      url:'https://www.ayudaenaccion.org',      note:'Cooperación al desarrollo y acción social en España. 43M€ anuales, 62% financiación privada. Acreditada FL.' },
+  { name:'Museo del Prado',             cat:'culture',     url:'https://www.museodelprado.es',       note:'Deducción especial: hasta 85% para instituciones culturales prioritarias (art. 19 Ley 49/2002). Patrimonio nacional.' },
+  { name:'Fund. Museo Thyssen',         cat:'culture',     url:'https://www.fundacion.museothyssen.org', note:'Conservación y difusión del arte. Deducción bajo Ley 49/2002.' },
+];
+
+const CAT_COLORS = { science:'#4A90D9', children:'#E8934A', environment:'#3D7A54', rights:'#9B59B6', culture:'#C49A3C' };
+const CAT_LABELS = { science:'Salud / Ciencia', children:'Infancia / Social', environment:'Medioambiente', rights:'DDHH / Internacional', culture:'Cultura / Patrimonio' };
+let activeFilter = 'all';
+
+let plans = {}, currentPlanId = null;
+
+function getDefaultPlan(name) {
+  return { name: name||'Mi Plan 2026', baseLiquidable:'', notes:'', orgs:[] };
+}
+function saveAll() {
+  localStorage.setItem('don_plans_v3', JSON.stringify(plans));
+  localStorage.setItem('don_cur_v3', currentPlanId);
+}
+function loadAll() {
+  try { plans = JSON.parse(localStorage.getItem('don_plans_v3'))||{}; } catch(e) { plans={}; }
+  currentPlanId = localStorage.getItem('don_cur_v3');
+  if (!Object.keys(plans).length) {
+    const id='plan_'+Date.now(); plans[id]=getDefaultPlan('Mi Plan 2026'); currentPlanId=id;
+  } else if (!currentPlanId||!plans[currentPlanId]) {
+    currentPlanId=Object.keys(plans)[0];
+  }
+}
+function renderPlanSelect() {
+  const sel=document.getElementById('planSelect');
+  sel.innerHTML='';
+  Object.entries(plans).forEach(([id,p])=>{
+    const o=document.createElement('option'); o.value=id; o.textContent=p.name;
+    if(id===currentPlanId) o.selected=true; sel.appendChild(o);
+  });
+}
+function loadPlan(id){ savePlanData(); currentPlanId=id; saveAll(); renderPlanUI(); }
+function openNewPlanModal(){ document.getElementById('newPlanName').value=''; document.getElementById('newPlanModal').classList.add('open'); setTimeout(()=>document.getElementById('newPlanName').focus(),100); }
+function createPlan(){
+  const name=document.getElementById('newPlanName').value.trim()||'Plan sin nombre';
+  const id='plan_'+Date.now(); plans[id]=getDefaultPlan(name); currentPlanId=id;
+  saveAll(); renderPlanSelect(); renderPlanUI(); closeModal('newPlanModal');
+}
+function deletePlan(){
+  if(Object.keys(plans).length<=1){alert('Debes tener al menos un plan.');return;}
+  if(!confirm(`¿Eliminar "${plans[currentPlanId].name}"?`))return;
+  delete plans[currentPlanId]; currentPlanId=Object.keys(plans)[0];
+  saveAll(); renderPlanSelect(); renderPlanUI();
+}
+function updatePlanName(){
+  plans[currentPlanId].name=document.getElementById('planNameInput').value;
+  document.getElementById('summaryYear').textContent=plans[currentPlanId].name;
+  renderPlanSelect(); saveAll();
+}
+function savePlanData(){
+  if(!currentPlanId)return;
+  plans[currentPlanId].baseLiquidable=document.getElementById('baseLiquidable').value;
+  plans[currentPlanId].notes=document.getElementById('planNotes').value;
+  saveAll();
+}
+function renderPlanUI(){
+  const plan=plans[currentPlanId];
+  document.getElementById('planNameInput').value=plan.name;
+  document.getElementById('baseLiquidable').value=plan.baseLiquidable||'';
+  document.getElementById('planNotes').value=plan.notes||'';
+  document.getElementById('summaryYear').textContent=plan.name;
+  renderOrgList(); updateSummary(); renderPlanSelect();
+}
+
+// ── ORGS ──
+function addOrg(preset){
+  const org={
+    id:'org_'+Date.now(), name:preset?preset.name:'', cat:preset?preset.cat:'science',
+    url:preset?preset.url:'', note:preset?preset.note:'',
+    payMode:'monthly', monthlyAmt:'', onetimeAmt:'', years:'1'
+  };
+  plans[currentPlanId].orgs.push(org); saveAll(); renderOrgList(); updateSummary();
+}
+function addPreset(idx){
+  const p=PRESETS[idx];
+  if(plans[currentPlanId].orgs.find(o=>o.name===p.name)){alert(`"${p.name}" ya está en tu plan.`);return;}
+  addOrg(p);
+}
+function removeOrg(orgId){
+  plans[currentPlanId].orgs=plans[currentPlanId].orgs.filter(o=>o.id!==orgId);
+  saveAll(); renderOrgList(); updateSummary();
+}
+function updateOrgField(orgId,field,value){
+  const org=plans[currentPlanId].orgs.find(o=>o.id===orgId);
+  if(org){org[field]=value; saveAll(); updateSummary();}
+}
+function setPayMode(orgId,mode){ updateOrgField(orgId,'payMode',mode); refreshCard(orgId); }
+
+function renderOrgList(){
+  const c=document.getElementById('orgList'), orgs=plans[currentPlanId].orgs;
+  if(!orgs.length){
+    c.innerHTML=`<div class="empty-state"><div class="empty-icon">🌱</div><p>Sin organizaciones aún.<br>Añade una manualmente o usa el acceso rápido.</p><button class="btn btn-primary" onclick="addOrg()">+ Añadir organización</button></div>`;
+    return;
+  }
+  c.innerHTML='';
+  orgs.forEach(org=>{
+    const d=document.createElement('div'); d.className='org-card'; d.id='orgcard_'+org.id;
+    d.innerHTML=orgCardHTML(org); c.appendChild(d);
+  });
+}
+
+function orgCardHTML(org){
+  const color=CAT_COLORS[org.cat]||'#8A8A82';
+  const bd=calcOrgDeduction(org), annual=getAnnualTotal(org);
+
+  const colsCls = org.payMode==='both' ? 'cols-4' : 'cols-3';
+
+  const bdHTML = annual>0 ? `
+    <div class="org-breakdown">
+      <div class="breakdown-item">
+        <div class="breakdown-val">${fmt(annual)}€</div>
+        <div class="breakdown-lbl">Anual</div>
+      </div>
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-item">
+        <div class="breakdown-val" style="color:#2C5F3F">−${fmt(bd.deduccion)}€</div>
+        <div class="breakdown-lbl">Deducción</div>
+      </div>
+      <div class="breakdown-divider"></div>
+      <div class="breakdown-item">
+        <div class="breakdown-val">${fmt(bd.realCost)}€</div>
+        <div class="breakdown-lbl">Coste real</div>
+      </div>
+      ${(org.payMode==='monthly'||org.payMode==='both')&&parseFloat(org.monthlyAmt)>0?`<div class="breakdown-tag">~${fmt(bd.realCost/12)}€/mes efectivos</div>`:''}
+      <div class="breakdown-note">${Math.round(bd.rate)}% ahorrado</div>
+    </div>` : '';
+
+  return `
+    <div class="org-card-top">
+      <div class="org-cat-dot" style="background:${color}"></div>
+      <div class="org-name-wrap">
+        <input class="org-name-input" type="text" value="${esc(org.name)}" placeholder="Nombre de la organización..."
+          oninput="updateOrgField('${org.id}','name',this.value)">
+        <input class="org-url-input" type="text" value="${esc(org.url||'')}" placeholder="www.organizacion.es"
+          oninput="updateOrgField('${org.id}','url',this.value)">
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div class="control-label" style="margin-bottom:6px">Tipo de pago</div>
+      <div class="payment-mode-toggle">
+        <button class="pmt-btn ${org.payMode==='monthly'?'active':''}" onclick="setPayMode('${org.id}','monthly')">📅 Cuota mensual</button>
+        <button class="pmt-btn ${org.payMode==='onetime'?'active':''}" onclick="setPayMode('${org.id}','onetime')">💡 Puntual</button>
+        <button class="pmt-btn ${org.payMode==='both'?'active':''}" onclick="setPayMode('${org.id}','both')">🔀 Ambas</button>
+      </div>
+    </div>
+    <div class="org-card-controls ${colsCls}">
+      <div class="control-group">
+        <div class="control-label">Categoría</div>
+        <select class="control-select" onchange="updateOrgField('${org.id}','cat',this.value);refreshCard('${org.id}')">
+          ${Object.entries(CAT_LABELS).map(([k,v])=>`<option value="${k}" ${org.cat===k?'selected':''}>${v}</option>`).join('')}
+        </select>
+      </div>
+      ${org.payMode!=='onetime'?`
+      <div class="control-group">
+        <div class="control-label">€ / mes</div>
+        <input class="control-input" type="number" min="0" step="5" value="${org.monthlyAmt||''}" placeholder="0"
+          oninput="updateOrgField('${org.id}','monthlyAmt',this.value);scheduleRefreshCard('${org.id}')">
+      </div>`:''}
+      ${org.payMode!=='monthly'?`
+      <div class="control-group">
+        <div class="control-label">Aportación puntual</div>
+        <input class="control-input" type="number" min="0" step="10" value="${org.onetimeAmt||''}" placeholder="0"
+          oninput="updateOrgField('${org.id}','onetimeAmt',this.value);scheduleRefreshCard('${org.id}')">
+      </div>`:''}
+      <div class="control-group">
+        <div class="control-label">Años consecutivos</div>
+        <select class="control-select" onchange="updateOrgField('${org.id}','years',this.value);scheduleRefreshCard('${org.id}')">
+          <option value="1" ${org.years=='1'?'selected':''}>1er año (40%)</option>
+          <option value="2" ${org.years=='2'?'selected':''}>2º año (40%)</option>
+          <option value="3" ${org.years=='3'?'selected':''}>3+ años (45%)</option>
+        </select>
+      </div>
+    </div>
+    ${org.note?`<div class="org-note-text">ℹ️ ${esc(org.note)}</div>`:''}
+    ${bdHTML}
+    <div class="org-card-footer">
+      <button class="btn btn-danger" onclick="removeOrg('${org.id}')">Eliminar</button>
+    </div>`;
+}
+
+let timers={};
+function scheduleRefreshCard(id){clearTimeout(timers[id]);timers[id]=setTimeout(()=>refreshCard(id),280);}
+function refreshCard(id){
+  const org=plans[currentPlanId].orgs.find(o=>o.id===id); if(!org)return;
+  const c=document.getElementById('orgcard_'+id); if(c)c.innerHTML=orgCardHTML(org);
+  updateSummary();
+}
+
+// ── CALC ──
+function getAnnualTotal(org){
+  const m=parseFloat(org.monthlyAmt)||0, o=parseFloat(org.onetimeAmt)||0;
+  if(org.payMode==='monthly') return m*12;
+  if(org.payMode==='onetime') return o;
+  return m*12+o;
+}
+function calcOrgDeduction(org){
+  const amount=getAnnualTotal(org);
+  if(amount<=0)return{deduccion:0,realCost:0,total:0,rate:0};
+  const er=parseInt(org.years)>=3?0.45:0.40;
+  const ded=amount<=250?amount*0.80:250*0.80+(amount-250)*er;
+  return{deduccion:ded,realCost:amount-ded,total:amount,rate:(ded/amount)*100};
+}
+
+// ── SUMMARY ──
+function updateSummary(){
+  const plan=plans[currentPlanId]; if(!plan)return;
+  let tot=0,totDed=0,t1b=0,t1d=0,t2b=0,t2d=0,t3b=0,t3d=0,totM=0,totO=0,hasM=false,hasO=false;
+  plan.orgs.forEach(org=>{
+    const a=getAnnualTotal(org); if(a<=0)return;
+    tot+=a;
+    const m=parseFloat(org.monthlyAmt)||0,o=parseFloat(org.onetimeAmt)||0;
+    if(org.payMode==='monthly'){totM+=m*12;hasM=true;}
+    else if(org.payMode==='onetime'){totO+=o;hasO=true;}
+    else{totM+=m*12;totO+=o;hasM=true;hasO=true;}
+    const yr=parseInt(org.years)||1,tr1=Math.min(a,250),ex=Math.max(0,a-250);
+    t1b+=tr1;t1d+=tr1*0.80;
+    if(yr>=3){t3b+=ex;t3d+=ex*0.45;}else{t2b+=ex;t2d+=ex*0.40;}
+    totDed+=tr1*0.80+(yr>=3?ex*0.45:ex*0.40);
+  });
+  const real=tot-totDed,rate=tot>0?(totDed/tot*100):0;
+  document.getElementById('summaryTotal').textContent=fmt(tot)+'€';
+  document.getElementById('summaryDeduccion').textContent='−'+fmt(totDed)+'€';
+  document.getElementById('summaryRealCost').textContent=fmt(real)+'€';
+  document.getElementById('summaryRealSub').textContent=`de ${fmt(tot)}€ donados al año`;
+  document.getElementById('summaryRate').textContent=tot>0?Math.round(rate)+'%':'—';
+  document.getElementById('t1amount').textContent=t1b>0?`${fmt(t1b)}€ → −${fmt(t1d)}€`:'—';
+  document.getElementById('t2amount').textContent=t2b>0?`${fmt(t2b)}€ → −${fmt(t2d)}€`:'—';
+  document.getElementById('t3amount').textContent=t3b>0?`${fmt(t3b)}€ → −${fmt(t3d)}€`:'—';
+
+  const mb=document.getElementById('monthlyBreakdown');
+  if(hasM||hasO){
+    mb.style.display='block';
+    document.getElementById('mbMonthly').textContent=hasM?fmt(totM)+'€':'—';
+    document.getElementById('mbOnetime').textContent=hasO?fmt(totO)+'€':'—';
+    document.getElementById('mbTotal').textContent=fmt(tot)+'€';
+  } else mb.style.display='none';
+
+  const base=parseFloat(document.getElementById('baseLiquidable').value)||0;
+  if(base>0){
+    const lim=base*0.10,pct=Math.min(tot/lim*100,100);
+    const fill=document.getElementById('limitBarFill');
+    fill.style.width=pct+'%';
+    fill.className='limit-bar-fill'+(pct>90?' danger':pct>70?' warning':'');
+    document.getElementById('limitPct').textContent=Math.round(pct)+'%';
+    document.getElementById('limitNote').textContent=`Límite: ${fmt(lim)}€ · Donado: ${fmt(tot)}€`;
+  } else {
+    document.getElementById('limitBarFill').style.width='0%';
+    document.getElementById('limitPct').textContent='—';
+    document.getElementById('limitNote').textContent='Introduce tu base liquidable para ver el límite';
+  }
+}
+
+// ── PRESETS UI ──
+function renderPresets(){
+  const cats=['all',...Object.keys(CAT_LABELS)];
+  document.getElementById('presetFilter').innerHTML=cats.map(c=>{
+    const lbl=c==='all'?'Todas':CAT_LABELS[c];
+    return `<button class="filter-btn ${c===activeFilter?'active':''}" onclick="setFilter('${c}')">${lbl}</button>`;
+  }).join('');
+  const filtered=activeFilter==='all'?PRESETS:PRESETS.filter(p=>p.cat===activeFilter);
+  document.getElementById('presetGrid').innerHTML=filtered.map(p=>{
+    const idx=PRESETS.indexOf(p);
+    return `<button class="preset-btn" onclick="addPreset(${idx})">
+      <span class="preset-cat" style="color:${CAT_COLORS[p.cat]}">${CAT_LABELS[p.cat]}</span>
+      ${p.name}</button>`;
+  }).join('');
+}
+function setFilter(cat){activeFilter=cat;renderPresets();}
+
+// ── EXPORT ──
+function exportCSV(){
+  const plan=plans[currentPlanId];
+  let csv='Organización,Categoría,€/mes,Puntual (€),Total anual (€),Años,Deducción IRPF (€),Coste real (€),% ahorrado\n';
+  plan.orgs.forEach(org=>{
+    const bd=calcOrgDeduction(org),a=getAnnualTotal(org);
+    csv+=`"${org.name}","${CAT_LABELS[org.cat]||org.cat}",${org.monthlyAmt||0},${org.onetimeAmt||0},${a.toFixed(2)},${org.years||1},${bd.deduccion.toFixed(2)},${bd.realCost.toFixed(2)},${bd.rate.toFixed(1)}%\n`;
+  });
+  const tot=plan.orgs.reduce((s,o)=>s+getAnnualTotal(o),0);
+  const totD=plan.orgs.reduce((s,o)=>s+calcOrgDeduction(o).deduccion,0);
+  csv+=`"TOTAL",,,,${tot.toFixed(2)},,${totD.toFixed(2)},${(tot-totD).toFixed(2)},${tot>0?((totD/tot)*100).toFixed(1)+'%':'—'}\n`;
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download=`donaciones_${plan.name.replace(/\s+/g,'_')}.csv`; a.click();
+}
+
+function fmt(n){return(Math.round((parseFloat(n)||0)*100)/100).toLocaleString('es-ES',{maximumFractionDigits:0});}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
+document.getElementById('newPlanName').addEventListener('keydown',e=>{if(e.key==='Enter')createPlan();});
+
+loadAll(); renderPresets(); renderPlanUI();
+</script>
+</body>
+</html>
