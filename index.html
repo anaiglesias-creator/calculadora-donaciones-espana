@@ -181,6 +181,12 @@
     .wrapper { padding:24px 16px 48px; }
     .org-card-controls.cols-3,.org-card-controls.cols-4 { grid-template-columns:1fr 1fr; }
   }
+
+  /* Lang toggle */
+  .lang-toggle { position:absolute; right:48px; top:16px; display:flex; background:rgba(255,255,255,0.12); border:1.5px solid rgba(255,255,255,0.25); border-radius:20px; padding:2px; }
+  .lang-btn { background:none; border:none; color:rgba(255,255,255,0.65); padding:4px 14px; border-radius:16px; cursor:pointer; font-family:'DM Sans',sans-serif; font-size:0.8rem; font-weight:500; transition:all 0.2s; }
+  .lang-btn.active { background:white; color:var(--forest); font-weight:600; }
+
 </style>
 </head>
 <body>
@@ -192,6 +198,10 @@
   <div class="header-badge">
     <div class="big">80%</div>
     <div class="small">hasta 250€/año</div>
+  </div>
+  <div class="lang-toggle" style="top:50%;transform:translateY(-50%) translateX(0);margin-top:-70px">
+    <button class="lang-btn active" onclick="setLang('es')">ES</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
   </div>
 </header>
 
@@ -321,6 +331,222 @@
 </div>
 
 <script>
+// ── I18N ──────────────────────────────────────────────────
+const LANG = {
+  es: {
+    title: 'Mi Plan de Donaciones · España',
+    eyebrow: 'Herramienta de planificación · Ley 49/2002',
+    headerSub: 'Calcula tu deducción real en el IRPF. Combina cuotas mensuales y aportaciones puntuales, y ve cuánto te cuestan realmente tus donaciones en España.',
+    icLabel: 'Base Liquidable',
+    icDesc: 'La ley española <strong>limita la deducción al 10% de tu base liquidable</strong>. Si tu base es 40.000€, solo puedes deducir donaciones hasta 4.000€ — si donas más, el exceso no desgrava. Es un tope que casi nadie alcanza, pero la barra te avisa si te acercas.',
+    icTip: '📄 Encuéntrala en tu última declaración de la renta, casilla 0500.',
+    icInputLabel: 'Base liquidable estimada',
+    planLabel: 'Plan',
+    btnNuevo: '+ Nuevo plan',
+    btnEliminar: '🗑 Eliminar',
+    btnCSV: '↓ CSV',
+    btnPrint: '🖨 Imprimir',
+    planPlaceholder: 'Nombre de mi plan...',
+    sectionOrgs: 'Organizaciones',
+    btnAnadir: '+ Añadir',
+    quickTitle: 'Añadir rápido — selección curada',
+    filterAll: 'Todas',
+    notesTitle: 'Notas del plan',
+    notesPlaceholder: 'Motivaciones, recordatorios, causas pendientes de investigar...',
+    summaryTitle: 'Resumen fiscal',
+    costLabel: 'Coste real después de IRPF',
+    totalLabel: 'Total donado al año',
+    deduccionLabel: 'Deducción en IRPF',
+    rateLabel: 'Tasa efectiva deducción',
+    limitLabel: 'Límite 10% base liquidable',
+    limitIntro: 'Introduce tu base liquidable para ver el límite',
+    tranchesTitle: 'Desglose por tramos',
+    t1label: 'Hasta 250€/entidad',
+    t2label: 'Exceso (años 1–2)',
+    t3label: 'Exceso (año 3+)',
+    mbMonthlyLabel: 'Cuotas mensuales (×12)',
+    mbOnetimeLabel: 'Aportaciones puntuales',
+    mbTotalLabel: 'Total anual',
+    infoBox: '<strong>Cómo funciona:</strong> Los primeros <strong>250€/año por entidad</strong> deducen al 80%. El exceso al 40% (años 1–2) o <strong>45%</strong> (3+ años consecutivos donando igual o más). Solo con entidades acogidas a la <strong>Ley 49/2002</strong>. Las cuotas mensuales se anualizan automáticamente.',
+    footerNote: 'Cálculos orientativos. Usa los certificados de donación que emita cada entidad para tu declaración de la renta. Verifica que cada organización esté acogida a la Ley 49/2002. <a href="https://www.fundacionlealtad.org" target="_blank">Fundación Lealtad</a> certifica transparencia en España. Datos guardados localmente en tu navegador.',
+    modalTitle: 'Nuevo plan de donaciones',
+    modalDesc: 'Dale un nombre (ej. "2026 · Ciencia y Naturaleza") y empezarás desde cero.',
+    modalPlaceholder: 'Nombre del plan...',
+    btnCancelar: 'Cancelar',
+    btnCrear: 'Crear plan',
+    emptyState: 'Sin organizaciones aún.<br>Añade una manualmente o usa el acceso rápido.',
+    btnAnadirOrg: '+ Añadir organización',
+    orgPlaceholder: 'Nombre de la organización...',
+    urlPlaceholder: 'www.organizacion.es',
+    payLabel: 'Tipo de pago',
+    pmtMonthly: '📅 Cuota mensual',
+    pmtOnetime: '💡 Puntual',
+    pmtBoth: '🔀 Ambas',
+    catLabel: 'Categoría',
+    monthlyAmt: '€ / mes',
+    onetimeAmt: 'Aportación puntual',
+    yearsLabel: 'Años consecutivos',
+    yr1: '1er año (40%)',
+    yr2: '2º año (40%)',
+    yr3: '3+ años (45%)',
+    btnEliminarOrg: 'Eliminar',
+    csvHeaders: 'Organización,Categoría,€/mes,Puntual (€),Total anual (€),Años,Deducción IRPF (€),Coste real (€),% ahorrado',
+    csvTotal: 'TOTAL',
+    alreadyInPlan: (name) => `"${name}" ya está en tu plan.`,
+    atLeastOne: 'Debes tener al menos un plan.',
+    confirmDelete: (name) => `¿Eliminar "${name}"?`,
+    limitNote: (lim, tot) => `Límite: ${lim}€ · Donado: ${tot}€`,
+    realSub: (tot) => `de ${tot}€ donados al año`,
+  },
+  en: {
+    title: 'My Donation Plan · Spain',
+    eyebrow: 'Planning tool · Ley 49/2002',
+    headerSub: 'Calculate your real cost after Spanish income tax relief (IRPF). Combine monthly subscriptions and one-off donations.',
+    icLabel: 'Taxable base (base liquidable)',
+    icDesc: 'Spanish law <strong>caps deductions at 10% of your taxable base</strong>. With a base of €40,000 you can deduct at most €4,000 in donations. Almost nobody hits this ceiling, but the bar will warn you if you get close.',
+    icTip: '📄 Find it in your last tax return, box 0500 (base liquidable general).',
+    icInputLabel: 'Estimated taxable base',
+    planLabel: 'Plan',
+    btnNuevo: '+ New plan',
+    btnEliminar: '🗑 Delete',
+    btnCSV: '↓ CSV',
+    btnPrint: '🖨 Print',
+    planPlaceholder: 'Name this plan...',
+    sectionOrgs: 'Organizations',
+    btnAnadir: '+ Add',
+    quickTitle: 'Quick add — curated selection',
+    filterAll: 'All',
+    notesTitle: 'Plan notes',
+    notesPlaceholder: 'Motivations, reminders, causes to research...',
+    summaryTitle: 'Tax summary',
+    costLabel: 'Real cost after income tax',
+    totalLabel: 'Total donated per year',
+    deduccionLabel: 'Income tax relief (IRPF)',
+    rateLabel: 'Effective relief rate',
+    limitLabel: '10% taxable base limit',
+    limitIntro: 'Enter your taxable base to see the limit',
+    tranchesTitle: 'Breakdown by tranche',
+    t1label: 'Up to €250/org',
+    t2label: 'Above €250 (yrs 1–2)',
+    t3label: 'Above €250 (yr 3+)',
+    mbMonthlyLabel: 'Monthly subscriptions (×12)',
+    mbOnetimeLabel: 'One-off donations',
+    mbTotalLabel: 'Total per year',
+    infoBox: '<strong>How it works:</strong> The first <strong>€250/year per organization</strong> gives 80% relief. The excess gives 40% (years 1–2) or <strong>45%</strong> (year 3+ if you give the same or more consecutively). Only valid for entities registered under <strong>Ley 49/2002</strong>. Monthly amounts are annualized automatically.',
+    footerNote: 'Indicative calculations only. Use the donation certificates issued by each organization for your tax return. Verify each organization is registered under Ley 49/2002. <a href="https://www.fundacionlealtad.org" target="_blank">Fundación Lealtad</a> is the Spanish transparency standard. Data saved locally in your browser.',
+    modalTitle: 'New donation plan',
+    modalDesc: 'Give it a name (e.g. "2026 · Science & Nature") and you will start from scratch.',
+    modalPlaceholder: 'Plan name...',
+    btnCancelar: 'Cancel',
+    btnCrear: 'Create plan',
+    emptyState: 'No organizations yet.<br>Add one manually or use the quick-add panel.',
+    btnAnadirOrg: '+ Add organization',
+    orgPlaceholder: 'Organization name...',
+    urlPlaceholder: 'www.organization.org',
+    payLabel: 'Payment type',
+    pmtMonthly: '📅 Monthly',
+    pmtOnetime: '💡 One-off',
+    pmtBoth: '🔀 Both',
+    catLabel: 'Category',
+    monthlyAmt: '€ / month',
+    onetimeAmt: 'One-off amount',
+    yearsLabel: 'Consecutive years',
+    yr1: 'Year 1 (40%)',
+    yr2: 'Year 2 (40%)',
+    yr3: 'Year 3+ (45%)',
+    btnEliminarOrg: 'Remove',
+    csvHeaders: 'Organization,Category,€/month,One-off (€),Annual total (€),Years,Tax relief (€),Real cost (€),Savings %',
+    csvTotal: 'TOTAL',
+    alreadyInPlan: (name) => `"${name}" is already in your plan.`,
+    atLeastOne: 'You must have at least one plan.',
+    confirmDelete: (name) => `Delete "${name}"?`,
+    limitNote: (lim, tot) => `Limit: €${lim} · Donated: €${tot}`,
+    realSub: (tot) => `of €${tot} donated per year`,
+  }
+};
+
+let currentLang = 'es';
+
+function T(key, ...args) {
+  const d = LANG[currentLang] || LANG.es;
+  const v = d[key] !== undefined ? d[key] : LANG.es[key];
+  return typeof v === 'function' ? v(...args) : (v || '');
+}
+
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === lang.toUpperCase()));
+  applyI18n();
+  renderPresets();
+  renderOrgList();
+  updateSummary();
+}
+
+function applyI18n() {
+  document.title = T('title');
+  const qe = document.querySelector('.header-eyebrow'); if(qe) qe.textContent = T('eyebrow');
+  const qs = document.querySelector('.header-sub'); if(qs) qs.textContent = T('headerSub');
+  const icl = document.querySelector('.ic-label'); if(icl) icl.textContent = T('icLabel');
+  const icd = document.querySelector('.ic-desc'); if(icd) icd.innerHTML = T('icDesc');
+  const ict = document.querySelector('.ic-tip'); if(ict) ict.textContent = T('icTip');
+  const icil = document.querySelector('.income-input-wrap label'); if(icil) icil.textContent = T('icInputLabel');
+  const plbl = document.querySelector('.plan-bar label'); if(plbl) plbl.textContent = T('planLabel');
+  const planInput = document.getElementById('planNameInput');
+  if(planInput) planInput.placeholder = T('planPlaceholder');
+  const secTitle = document.querySelector('.section-title'); if(secTitle) secTitle.textContent = T('sectionOrgs');
+  const qat = document.querySelector('.quick-add-title'); if(qat) qat.textContent = T('quickTitle');
+  const nt = document.querySelector('#planNotes'); if(nt) nt.placeholder = T('notesPlaceholder');
+  const st = document.querySelector('.summary-title'); if(st) st.textContent = T('summaryTitle');
+  const cl = document.querySelector('.summary-real-cost .label'); if(cl) cl.textContent = T('costLabel');
+  const tt = document.querySelector('.tranches-title'); if(tt) tt.textContent = T('tranchesTitle');
+  const ib = document.querySelector('.info-box'); if(ib) ib.innerHTML = T('infoBox');
+  const fn = document.querySelector('.footer-note'); if(fn) fn.innerHTML = T('footerNote');
+  const mt = document.querySelector('#newPlanModal h3'); if(mt) mt.textContent = T('modalTitle');
+  const mp = document.querySelector('#newPlanModal p'); if(mp) mp.textContent = T('modalDesc');
+  const mip = document.querySelector('#newPlanModal .modal-input'); if(mip) mip.placeholder = T('modalPlaceholder');
+  const bn = document.querySelector('.btn-outline'); if(bn) bn.textContent = T('btnNuevo');
+  const nt2 = document.querySelector('.section-title + .btn-ghost, .section-title ~ button.btn-ghost'); 
+  const notesH = document.querySelectorAll('.section-title'); 
+  if(notesH.length > 1) notesH[notesH.length-1].textContent = T('notesTitle');
+  updateSummaryLabels();
+  updateLimitNote();
+}
+
+function updateSummaryLabels() {
+  const els = {
+    '.summary-row:nth-child(1) .summary-row-label': T('totalLabel'),
+    '.summary-row:nth-child(2) .summary-row-label': T('deduccionLabel'),
+    '.summary-row:nth-child(3) .summary-row-label': T('rateLabel'),
+  };
+  document.querySelectorAll('.summary-row').forEach((row, i) => {
+    const lbl = row.querySelector('.summary-row-label');
+    if (!lbl) return;
+    if (i === 0) lbl.textContent = T('totalLabel');
+    else if (i === 1) lbl.textContent = T('deduccionLabel');
+    else if (i === 2) lbl.textContent = T('rateLabel');
+  });
+  const lbh = document.querySelector('.limit-bar-header span:first-child');
+  if (lbh) lbh.textContent = T('limitLabel');
+  const trows = document.querySelectorAll('.tranche-row');
+  if (trows[0]) trows[0].querySelector('.tranche-label').textContent = T('t1label');
+  if (trows[1]) trows[1].querySelector('.tranche-label').textContent = T('t2label');
+  if (trows[2]) trows[2].querySelector('.tranche-label').textContent = T('t3label');
+  const mbRows = document.querySelectorAll('.mb-row');
+  if (mbRows[0]) mbRows[0].querySelector('span:first-child').textContent = T('mbMonthlyLabel');
+  if (mbRows[1]) mbRows[1].querySelector('span:first-child').textContent = T('mbOnetimeLabel');
+  if (mbRows[2]) mbRows[2].querySelector('span:first-child').textContent = T('mbTotalLabel');
+}
+
+function updateLimitNote() {
+  const ln = document.getElementById('limitNote');
+  if (ln && ln.textContent.includes('ntroduce') || (ln && ln.textContent.includes('nter'))) {
+    ln.textContent = T('limitIntro');
+  }
+}
+
+
+const CAT_LABELS_EN = { science:'Health / Science', children:'Children / Social', environment:'Environment', rights:'Human Rights / International', culture:'Culture / Heritage' };
+
 const PRESETS = [
   { name:'Fund. Científica AECC',       cat:'science',     url:'https://fundacion.aecc.es',         note:'94,8% a misión. Mayor ONG de investigación oncológica de España. Acreditada Fundación Lealtad.' },
   { name:'Fund. CRIS contra el Cáncer', cat:'science',     url:'https://criscancer.org',             note:'Financia unidades de investigación y ensayos clínicos directamente en hospitales. Acreditada FL.' },
@@ -383,8 +609,8 @@ function createPlan(){
   saveAll(); renderPlanSelect(); renderPlanUI(); closeModal('newPlanModal');
 }
 function deletePlan(){
-  if(Object.keys(plans).length<=1){alert('Debes tener al menos un plan.');return;}
-  if(!confirm(`¿Eliminar "${plans[currentPlanId].name}"?`))return;
+  if(Object.keys(plans).length<=1){alert(T('atLeastOne'));return;}
+  if(!confirm(T('confirmDelete',plans[currentPlanId].name)))return;
   delete plans[currentPlanId]; currentPlanId=Object.keys(plans)[0];
   saveAll(); renderPlanSelect(); renderPlanUI();
 }
@@ -419,7 +645,7 @@ function addOrg(preset){
 }
 function addPreset(idx){
   const p=PRESETS[idx];
-  if(plans[currentPlanId].orgs.find(o=>o.name===p.name)){alert(`"${p.name}" ya está en tu plan.`);return;}
+  if(plans[currentPlanId].orgs.find(o=>o.name===p.name)){alert(T('alreadyInPlan',p.name));return;}
   addOrg(p);
 }
 function removeOrg(orgId){
@@ -567,7 +793,7 @@ function updateSummary(){
   document.getElementById('summaryTotal').textContent=fmt(tot)+'€';
   document.getElementById('summaryDeduccion').textContent='−'+fmt(totDed)+'€';
   document.getElementById('summaryRealCost').textContent=fmt(real)+'€';
-  document.getElementById('summaryRealSub').textContent=`de ${fmt(tot)}€ donados al año`;
+  document.getElementById('summaryRealSub').textContent=T('realSub',fmt(tot));
   document.getElementById('summaryRate').textContent=tot>0?Math.round(rate)+'%':'—';
   document.getElementById('t1amount').textContent=t1b>0?`${fmt(t1b)}€ → −${fmt(t1d)}€`:'—';
   document.getElementById('t2amount').textContent=t2b>0?`${fmt(t2b)}€ → −${fmt(t2d)}€`:'—';
@@ -588,11 +814,11 @@ function updateSummary(){
     fill.style.width=pct+'%';
     fill.className='limit-bar-fill'+(pct>90?' danger':pct>70?' warning':'');
     document.getElementById('limitPct').textContent=Math.round(pct)+'%';
-    document.getElementById('limitNote').textContent=`Límite: ${fmt(lim)}€ · Donado: ${fmt(tot)}€`;
+    document.getElementById('limitNote').textContent=T('limitNote',fmt(lim),fmt(tot));
   } else {
     document.getElementById('limitBarFill').style.width='0%';
     document.getElementById('limitPct').textContent='—';
-    document.getElementById('limitNote').textContent='Introduce tu base liquidable para ver el límite';
+    document.getElementById('limitNote').textContent=T('limitIntro');
   }
 }
 
@@ -616,14 +842,18 @@ function setFilter(cat){activeFilter=cat;renderPresets();}
 // ── EXPORT ──
 function exportCSV(){
   const plan=plans[currentPlanId];
-  let csv='Organización,Categoría,€/mes,Puntual (€),Total anual (€),Años,Deducción IRPF (€),Coste real (€),% ahorrado\n';
+  const BOM='\uFEFF', SEP=';';
+  const headers=T('csvHeaders').split(',');
+  let rows=[headers];
   plan.orgs.forEach(org=>{
     const bd=calcOrgDeduction(org),a=getAnnualTotal(org);
-    csv+=`"${org.name}","${CAT_LABELS[org.cat]||org.cat}",${org.monthlyAmt||0},${org.onetimeAmt||0},${a.toFixed(2)},${org.years||1},${bd.deduccion.toFixed(2)},${bd.realCost.toFixed(2)},${bd.rate.toFixed(1)}%\n`;
+    const cat=currentLang==='en'?(CAT_LABELS_EN[org.cat]||org.cat):(CAT_LABELS[org.cat]||org.cat);
+    rows.push([org.name,cat,org.monthlyAmt||0,org.onetimeAmt||0,a.toFixed(2),org.years||1,bd.deduccion.toFixed(2),bd.realCost.toFixed(2),bd.rate.toFixed(1)+'%']);
   });
   const tot=plan.orgs.reduce((s,o)=>s+getAnnualTotal(o),0);
   const totD=plan.orgs.reduce((s,o)=>s+calcOrgDeduction(o).deduccion,0);
-  csv+=`"TOTAL",,,,${tot.toFixed(2)},,${totD.toFixed(2)},${(tot-totD).toFixed(2)},${tot>0?((totD/tot)*100).toFixed(1)+'%':'—'}\n`;
+  rows.push([T('csvTotal'),'','','',tot.toFixed(2),'',totD.toFixed(2),(tot-totD).toFixed(2),tot>0?((totD/tot)*100).toFixed(1)+'%':'—']);
+  const csv=BOM+rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(SEP)).join('\r\n');
   const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=`donaciones_${plan.name.replace(/\s+/g,'_')}.csv`; a.click();
@@ -635,7 +865,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)el.classList.remove('open');}));
 document.getElementById('newPlanName').addEventListener('keydown',e=>{if(e.key==='Enter')createPlan();});
 
-loadAll(); renderPresets(); renderPlanUI();
+loadAll(); applyI18n(); renderPresets(); renderPlanUI();
 </script>
 </body>
 </html>
